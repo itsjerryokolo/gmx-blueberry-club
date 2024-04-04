@@ -1,0 +1,17 @@
+{
+  "name": "puppet-subgraph",
+  "license": "UNLICENSED",
+  "scripts": {
+    "codegen": "graph codegen",
+    "build": "graph codegen && graph build",
+    "deploy": "graph deploy --node https://api.studio.thegraph.com/deploy/ gmx-blueberry-club",
+    "create-local": "graph create --node http://localhost:8020/ gmx-blueberry-club",
+    "remove-local": "graph remove --node http://localhost:8020/ gmx-blueberry-club",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 gmx-blueberry-club",
+    "test": "graph test"
+  },
+  "dependencies": {
+    "@graphprotocol/graph-cli": "0.69.1",
+    "@graphprotocol/graph-ts": "0.33.0"
+  }
+}

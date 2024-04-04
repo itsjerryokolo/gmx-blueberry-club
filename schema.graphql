@@ -1,0 +1,745 @@
+type OrderCreated @entity(immutable: true) {
+  id: Bytes!
+  key: Bytes!
+
+  account: Bytes!
+  receiver: Bytes!
+  callbackContract: Bytes!
+  uiFeeReceiver: Bytes!
+  market: Bytes!
+  initialCollateralToken: Bytes!
+
+  swapPath: [Bytes!]!
+
+  orderType: Int!
+  decreasePositionSwapType: BigInt!
+  sizeDeltaUsd: BigInt!
+  initialCollateralDeltaAmount: BigInt!
+  triggerPrice: BigInt!
+  acceptablePrice: BigInt!
+  executionFee: BigInt!
+  callbackGasLimit: BigInt!
+  minOutputAmount: BigInt!
+  updatedAtBlock: BigInt!
+
+  isLong: Boolean!
+  shouldUnwrapNativeToken: Boolean!
+  isFrozen: Boolean!
+}
+
+type OrderSizeDeltaAutoUpdated @entity(immutable: true) {
+  id: Bytes!
+  key: Bytes!
+  sizeDeltaUsd: BigInt!
+  nextSizeDeltaUsd: BigInt!
+}
+
+type OrderCollateralDeltaAmountAutoUpdated @entity(immutable: true) {
+  id: Bytes!
+  key: Bytes!
+  collateralDeltaAmount: BigInt!
+  nextCollateralDeltaAmount: BigInt!
+}
+
+type OrderCancelled @entity(immutable: true) {
+  link: PositionLink!
+
+  id: Bytes!
+  key: Bytes!
+  account: Bytes!
+  reason: String!
+  reasonBytes: Bytes!
+}
+
+type OrderFrozen @entity(immutable: true) {
+  link: PositionLink!
+
+  id: Bytes!
+  key: Bytes!
+  account: Bytes!
+  reason: String!
+  reasonBytes: Bytes!
+}
+
+type OrderStatus @entity(immutable: true) {
+  id: Bytes!
+  order: OrderCreated!
+  orderType: Int!
+  statusType: Int!
+  message: String!
+
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  logIndex: BigInt!
+}
+
+type PositionLink @entity(immutable: true) {
+  id: Bytes!
+  key: Bytes!
+
+  increaseList: [PositionIncrease!] @derivedFrom(field: "link")
+  decreaseList: [PositionDecrease!] @derivedFrom(field: "link")
+  feeUpdateList: [PositionFeesCollected!] @derivedFrom(field: "link")
+}
+
+type PositionFeesCollected @entity(immutable: true) {
+  id: Bytes! # bytes32
+  link: PositionLink! # bytes32
+  orderKey: Bytes! # bytes32
+  positionKey: Bytes! # bytes32
+  referralCode: Bytes! # bytes32
+  market: Bytes! # address
+  collateralToken: Bytes! # address
+  affiliate: Bytes! # address
+  trader: Bytes! # address
+  uiFeeReceiver: Bytes! # address
+  collateralTokenPriceMin: BigInt!
+  collateralTokenPriceMax: BigInt!
+  tradeSizeUsd: BigInt!
+  totalRebateFactor: BigInt!
+  traderDiscountFactor: BigInt!
+  totalRebateAmount: BigInt!
+  traderDiscountAmount: BigInt!
+  affiliateRewardAmount: BigInt!
+  fundingFeeAmount: BigInt!
+  claimableLongTokenAmount: BigInt!
+  claimableShortTokenAmount: BigInt!
+  latestFundingFeeAmountPerSize: BigInt!
+  latestLongTokenClaimableFundingAmountPerSize: BigInt!
+  latestShortTokenClaimableFundingAmountPerSize: BigInt!
+  borrowingFeeUsd: BigInt!
+  borrowingFeeAmount: BigInt!
+  borrowingFeeReceiverFactor: BigInt!
+  borrowingFeeAmountForFeeReceiver: BigInt!
+  positionFeeFactor: BigInt!
+  protocolFeeAmount: BigInt!
+  positionFeeReceiverFactor: BigInt!
+  feeReceiverAmount: BigInt!
+  feeAmountForPool: BigInt!
+  positionFeeAmountForPool: BigInt!
+  positionFeeAmount: BigInt!
+  totalCostAmount: BigInt!
+  uiFeeReceiverFactor: BigInt!
+  uiFeeAmount: BigInt!
+
+  isIncrease: Boolean!
+
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  # transactionIndex: BigInt!
+  logIndex: BigInt!
+}
+
+type PositionFeesInfo @entity(immutable: true) {
+  id: Bytes! # bytes32
+  link: PositionLink! # bytes32
+  orderKey: Bytes! # bytes32
+  positionKey: Bytes! # bytes32
+  referralCode: Bytes! # bytes32
+  market: Bytes! # address
+  collateralToken: Bytes! # address
+  affiliate: Bytes! # address
+  trader: Bytes! # address
+  uiFeeReceiver: Bytes! # address
+  collateralTokenPriceMin: BigInt!
+  collateralTokenPriceMax: BigInt!
+  tradeSizeUsd: BigInt!
+  totalRebateFactor: BigInt!
+  traderDiscountFactor: BigInt!
+  totalRebateAmount: BigInt!
+  traderDiscountAmount: BigInt!
+  affiliateRewardAmount: BigInt!
+  fundingFeeAmount: BigInt!
+  claimableLongTokenAmount: BigInt!
+  claimableShortTokenAmount: BigInt!
+  latestFundingFeeAmountPerSize: BigInt!
+  latestLongTokenClaimableFundingAmountPerSize: BigInt!
+  latestShortTokenClaimableFundingAmountPerSize: BigInt!
+  borrowingFeeUsd: BigInt!
+  borrowingFeeAmount: BigInt!
+  borrowingFeeReceiverFactor: BigInt!
+  borrowingFeeAmountForFeeReceiver: BigInt!
+  positionFeeFactor: BigInt!
+  protocolFeeAmount: BigInt!
+  positionFeeReceiverFactor: BigInt!
+  feeReceiverAmount: BigInt!
+  feeAmountForPool: BigInt!
+  positionFeeAmountForPool: BigInt!
+  positionFeeAmount: BigInt!
+  totalCostAmount: BigInt!
+  uiFeeReceiverFactor: BigInt!
+  uiFeeAmount: BigInt!
+
+  isIncrease: Boolean!
+
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  # transactionIndex: BigInt!
+  logIndex: BigInt!
+}
+
+type PositionIncrease @entity(immutable: true) {
+  id: Bytes!
+  link: PositionLink!
+  order: OrderStatus!
+  feeCollected: PositionFeesCollected! # bytes32
+  account: Bytes!
+  market: Bytes!
+  collateralToken: Bytes!
+
+  sizeInTokens: BigInt!
+  sizeInUsd: BigInt!
+  collateralAmount: BigInt!
+  borrowingFactor: BigInt!
+  fundingFeeAmountPerSize: BigInt!
+  longTokenClaimableFundingAmountPerSize: BigInt!
+  shortTokenClaimableFundingAmountPerSize: BigInt!
+  executionPrice: BigInt!
+  indexTokenPriceMax: BigInt!
+  indexTokenPriceMin: BigInt!
+  collateralTokenPriceMax: BigInt!
+  collateralTokenPriceMin: BigInt!
+  sizeDeltaUsd: BigInt!
+  sizeDeltaInTokens: BigInt!
+  orderType: Int!
+
+  collateralDeltaAmount: BigInt!
+  priceImpactUsd: BigInt!
+  priceImpactAmount: BigInt!
+
+  isLong: Boolean!
+
+  orderKey: Bytes!
+  positionKey: Bytes!
+
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  # transactionIndex: BigInt!
+  logIndex: BigInt!
+}
+
+type PositionDecrease @entity(immutable: true) {
+  id: Bytes!
+  link: PositionLink!
+  order: OrderStatus!
+  feeCollected: PositionFeesCollected! # bytes32
+  account: Bytes!
+  market: Bytes!
+  collateralToken: Bytes!
+
+  sizeInUsd: BigInt!
+  sizeInTokens: BigInt!
+  collateralAmount: BigInt!
+  borrowingFactor: BigInt!
+  fundingFeeAmountPerSize: BigInt!
+  longTokenClaimableFundingAmountPerSize: BigInt!
+  shortTokenClaimableFundingAmountPerSize: BigInt!
+  executionPrice: BigInt!
+  indexTokenPriceMax: BigInt!
+  indexTokenPriceMin: BigInt!
+  collateralTokenPriceMax: BigInt!
+  collateralTokenPriceMin: BigInt!
+  sizeDeltaUsd: BigInt!
+  sizeDeltaInTokens: BigInt!
+  collateralDeltaAmount: BigInt!
+  valuesPriceImpactDiffUsd: BigInt!
+  orderType: Int!
+
+  priceImpactUsd: BigInt!
+  basePnlUsd: BigInt!
+  uncappedBasePnlUsd: BigInt!
+
+  isLong: Boolean!
+
+  orderKey: Bytes!
+  positionKey: Bytes!
+
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  # transactionIndex: BigInt!
+  logIndex: BigInt!
+}
+
+type ReferralAccount @entity {
+  id: Bytes!
+  code: Bytes!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type PositionOpen @entity {
+  id: ID! # bytes32
+  key: Bytes! # bytes32
+  link: PositionLink! # bytes32
+  account: Bytes! # address
+  market: Bytes! # address
+  collateralToken: Bytes! # address
+  indexToken: Bytes! # address
+  sizeInUsd: BigInt!
+  sizeInTokens: BigInt!
+  collateralAmount: BigInt!
+  realisedPnlUsd: BigInt!
+
+  referralAccount: ReferralAccount
+  referralMember: Boolean
+
+  cumulativeSizeUsd: BigInt!
+  cumulativeSizeToken: BigInt!
+  cumulativeCollateralUsd: BigInt!
+  cumulativeCollateralToken: BigInt!
+
+  maxSizeUsd: BigInt!
+  maxSizeToken: BigInt!
+  maxCollateralUsd: BigInt!
+  maxCollateralToken: BigInt!
+
+  isLong: Boolean!
+
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  # transactionIndex: BigInt!
+  logIndex: BigInt!
+}
+
+type PositionSettled @entity(immutable: true) {
+  id: Bytes!
+  key: Bytes! # bytes32
+  link: PositionLink! # bytes32
+  account: Bytes! # address
+  market: Bytes! # address
+  collateralToken: Bytes! # address
+  indexToken: Bytes! # address
+  referralAccount: ReferralAccount
+  referralMember: Boolean
+
+  sizeInUsd: BigInt!
+  sizeInTokens: BigInt!
+  collateralAmount: BigInt!
+  realisedPnlUsd: BigInt!
+
+  cumulativeSizeUsd: BigInt!
+  cumulativeSizeToken: BigInt!
+  cumulativeCollateralUsd: BigInt!
+  cumulativeCollateralToken: BigInt!
+
+  maxSizeUsd: BigInt!
+  maxSizeToken: BigInt!
+  maxCollateralUsd: BigInt!
+  maxCollateralToken: BigInt!
+
+  isLong: Boolean!
+
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  # transactionIndex: BigInt!
+  logIndex: BigInt!
+}
+
+type PriceCandleSeed @entity {
+  id: ID!
+  token: Bytes!
+  interval: Int!
+  timestamp: Int!
+  o: BigInt!
+  h: BigInt!
+  l: BigInt!
+  c: BigInt!
+}
+
+type PriceCandle @entity(immutable: true) {
+  id: ID!
+  token: Bytes!
+  interval: Int!
+  timestamp: Int!
+  o: BigInt!
+  h: BigInt!
+  l: BigInt!
+  c: BigInt!
+}
+
+type MirrorPositionLink @entity(immutable: true) {
+  id: Bytes!
+  shareIncreaseList: [SharesIncrease!] @derivedFrom(field: "link")
+}
+
+type MirrorPositionOpen @entity {
+  id: ID!
+  link: MirrorPositionLink!
+
+  position: PositionOpen
+  positionKey: Bytes!
+
+  trader: Bytes!
+  tradeRoute: Bytes!
+
+  puppets: [Bytes!]! # address[]
+  puppetsShares: [BigInt!]!
+  traderShares: BigInt!
+  totalSupply: BigInt!
+
+  routeTypeKey: Bytes!
+  tradeRouteKey: Bytes!
+
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type MirrorPositionSettled @entity(immutable: true) {
+  id: Bytes!
+  link: MirrorPositionLink!
+
+  position: PositionSettled!
+  positionKey: Bytes!
+
+  trader: Bytes!
+  tradeRoute: Bytes!
+
+  puppets: [Bytes!]! # address[]
+  puppetsShares: [BigInt!]!
+  traderShares: BigInt!
+  totalSupply: BigInt!
+
+  routeTypeKey: Bytes!
+  tradeRouteKey: Bytes!
+
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type ExecutePosition @entity(immutable: true) {
+  id: Bytes!
+  performanceFeePaid: BigInt! # uint256
+  tradeRoute: Bytes! # address
+  requestKey: Bytes! # bytes32
+  isExecuted: Boolean! # bool
+  isIncrease: Boolean! # bool
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type RequestMirrorPosition @entity(immutable: true) {
+  id: Bytes!
+  puppets: [Bytes!]! # address[]
+  trader: Bytes! # address
+  tradeRoute: Bytes! # address
+  isIncrease: Boolean! # bool
+  requestKey: Bytes! # bytes32
+  routeTypeKey: Bytes! # bytes32
+  positionKey: Bytes! # bytes32
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type SetRouteType @entity(immutable: true) {
+  id: Bytes!
+  routeTypeKey: Bytes! # bytes32
+  collateralToken: Bytes! # address
+  indexToken: Bytes! # address
+  isLong: Boolean! # bool
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type SharesIncrease @entity(immutable: true) {
+  id: Bytes!
+  link: MirrorPositionLink!
+  puppetsShares: [BigInt!]! # uint256[]
+  traderShares: BigInt! # uint256
+  totalSupply: BigInt! # uint256
+  requestKey: Bytes! # bytes32
+  tradeRoute: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type SubscribeTradeRoute @entity(immutable: true) {
+  id: Bytes!
+  puppetTradeRoute: PuppetTradeRoute!
+  allowance: BigInt! # uint256
+  subscriptionExpiry: BigInt! # uint256
+  trader: Bytes! # address
+  puppet: Bytes! # address
+  tradeRoute: Bytes! # address
+  routeTypeKey: Bytes! # bytes32
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type Withdraw @entity(immutable: true) {
+  id: Bytes!
+  amount: BigInt! # uint256
+  asset: Bytes! # address
+  receiver: Bytes! # address
+  puppet: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type Deposit @entity(immutable: true) {
+  id: Bytes!
+  amount: BigInt! # uint256
+  asset: Bytes! # address
+  caller: Bytes! # address
+  puppet: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type PuppetPositionOpen @entity {
+  id: Bytes!
+  position: MirrorPositionOpen!
+  puppetTradeRoute: PuppetTradeRoute!
+
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type PuppetPositionSettled @entity(immutable: true) {
+  id: Bytes!
+  position: MirrorPositionSettled!
+  puppetTradeRoute: PuppetTradeRoute!
+
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type PuppetTradeRoute @entity(immutable: true) {
+  id: Bytes!
+  routeTypeKey: Bytes! # bytes32
+  puppet: Bytes! # address
+  trader: Bytes! # address
+  tradeRoute: Bytes! # address
+  openList: [PuppetPositionOpen!] @derivedFrom(field: "puppetTradeRoute")
+  settledList: [PuppetPositionSettled!] @derivedFrom(field: "puppetTradeRoute")
+  subscribeList: [SubscribeTradeRoute!] @derivedFrom(field: "puppetTradeRoute")
+}
+
+type AdjustPosition @entity(immutable: true) {
+  id: Bytes!
+  trader: Bytes! # address
+  tradeRoute: Bytes! # address
+  isIncrease: Boolean! # bool
+  requestKey: Bytes! # bytes32
+  routeTypeKey: Bytes! # bytes32
+  positionKey: Bytes! # bytes32
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type MarketCreated @entity(immutable: true) {
+  id: Bytes!
+  indexToken: Bytes!
+  longToken: Bytes!
+  shortToken: Bytes!
+  marketToken: Bytes!
+  salt: Bytes!
+}
+
+type CreditPuppet @entity(immutable: true) {
+  id: Bytes!
+  amount: BigInt! # uint256
+  asset: Bytes! # address
+  puppet: Bytes! # address
+  caller: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type DebitPuppet @entity(immutable: true) {
+  id: Bytes!
+  amount: BigInt! # uint256
+  asset: Bytes! # address
+  puppet: Bytes! # address
+  caller: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+# OptionPuppet
+type AddRewards @entity(immutable: true) {
+  id: Bytes!
+  amount: BigInt! # uint256
+  gauge: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type Exercise @entity(immutable: true) {
+  id: Bytes!
+  amount: BigInt! # uint256
+  strike: BigInt! # uint256
+  OptionPuppet_id: BigInt! # uint256
+  receiver: Bytes! # address
+  sender: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type Mint @entity(immutable: true) {
+  id: Bytes!
+  price: BigInt! # uint256
+  amount: BigInt! # uint256
+  strike: BigInt! # uint256
+  expiry: BigInt! # uint256
+  OptionPuppet_id: BigInt! # uint256
+  gauge: Bytes! # address
+  receiver: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type Refund @entity(immutable: true) {
+  id: Bytes!
+  sender: Bytes! # address
+  receiver: Bytes! # address
+  amount: BigInt! # uint256
+  strike: BigInt! # uint256
+  OptionPuppet_id: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type SetDiscount @entity(immutable: true) {
+  id: Bytes!
+  discount: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type Claim @entity(immutable: true) {
+  id: Bytes!
+  epoch: BigInt! # uint256
+  userReward: BigInt! # uint256
+  user: Bytes! # address
+  receiver: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type DepositRewards @entity(immutable: true) {
+  id: Bytes!
+  amount: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+# type UserScoreUpdate @entity(immutable: true) {
+#   id: Bytes!
+#   user: Bytes! # address
+#   volume: BigInt! # uint256
+#   profit: BigInt! # uint256
+#   blockNumber: BigInt!
+#   blockTimestamp: BigInt!
+#   transactionHash: Bytes!
+# }
+
+type WeightsUpdate @entity(immutable: true) {
+  id: Bytes!
+  profitWeight: BigInt! # uint256
+  volumeWeight: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+type GovSetCodeOwner @entity(immutable: true) {
+  id: Bytes!
+  code: Bytes! # bytes32
+  newAccount: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type RegisterCode @entity(immutable: true) {
+  id: Bytes!
+  account: Bytes! # address
+  code: Bytes! # bytes32
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type SetCodeOwner @entity(immutable: true) {
+  id: Bytes!
+  account: Bytes! # address
+  newAccount: Bytes! # address
+  code: Bytes! # bytes32
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type SetHandler @entity(immutable: true) {
+  id: Bytes!
+  handler: Bytes! # address
+  isActive: Boolean! # bool
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type SetReferrerDiscountShare @entity(immutable: true) {
+  id: Bytes!
+  referrer: Bytes! # address
+  discountShare: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type SetReferrerTier @entity(immutable: true) {
+  id: Bytes!
+  referrer: Bytes! # address
+  tierId: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type SetTier @entity(immutable: true) {
+  id: Bytes!
+  tierId: BigInt! # uint256
+  totalRebate: BigInt! # uint256
+  discountShare: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type SetTraderReferralCode @entity(immutable: true) {
+  id: Bytes!
+  account: Bytes! # address
+  code: Bytes! # bytes32
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
