@@ -1,15 +1,15 @@
 import { log } from "@graphprotocol/graph-ts";
-import { SetTraderReferralCode as SetTraderReferralCodeEvent } from "../generated/ReferralStorage/ReferralStorage";
+import { SetTraderReferralCode } from "../generated/ReferralStorage/ReferralStorage";
 import { ReferralAccount } from "../generated/schema";
 import { BLUEBERRY_REFERRAL_CODE } from "./common/const";
 
 export function handleSetTraderReferralCode(
-	event: SetTraderReferralCodeEvent
+	event: SetTraderReferralCode
 ): void {
 	if (event.params.code.toHexString() == BLUEBERRY_REFERRAL_CODE) {
 		log.warning("Refferal Code Found---> Account: {}, Code: {}", [
 			event.params.account.toHexString(),
-			BLUEBERRY_REFERRAL_CODE,
+			event.params.code.toHexString(),
 		]);
 
 		let referralAccount = new ReferralAccount(event.params.account);
