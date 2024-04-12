@@ -27,6 +27,13 @@ type OrderCreated @entity(immutable: true) {
   isFrozen: Boolean!
 }
 
+type ReferralPositionID @entity {
+  id: ID!
+  keyID: Bytes!
+  isOpen: Boolean!
+  referralAccount: ReferralAccount
+}
+
 type OrderSizeDeltaAutoUpdated @entity(immutable: true) {
   id: Bytes!
   key: Bytes!

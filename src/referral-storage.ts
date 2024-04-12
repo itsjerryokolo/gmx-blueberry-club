@@ -1,11 +1,30 @@
-import { log } from "@graphprotocol/graph-ts";
+import { Address, log, store } from "@graphprotocol/graph-ts";
 import { SetTraderReferralCode } from "../generated/ReferralStorage/ReferralStorage";
-import { ReferralAccount } from "../generated/schema";
+import {
+	PositionOpen,
+	ReferralAccount,
+	ReferralPositionID,
+} from "../generated/schema";
 import { BLUEBERRY_REFERRAL_CODE } from "./common/const";
 
 export function handleSetTraderReferralCode(
 	event: SetTraderReferralCode
 ): void {
+	let referralAccount = ReferralAccount.load(event.params.account);
+	if (referralAccount) {
+		let referralPositionID = ReferralPositionID.load(
+			event.params.account.toHexString()
+		);
+		if (referralPositionID) {
+			//remove open position
+			let id = referralPositionID.keyID.toHexString();
+			let position = PositionOpen.load(id);
+			if (position) {
+				store.remove("PositionOpen", id);
+			}
+		}
+	}
+
 	if (event.params.code.toHexString() == BLUEBERRY_REFERRAL_CODE) {
 		log.warning("Refferal Code Found---> Account: {}, Code: {}", [
 			event.params.account.toHexString(),
