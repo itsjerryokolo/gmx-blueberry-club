@@ -28,7 +28,7 @@ type OrderCreated @entity(immutable: true) {
 }
 
 type ReferralPositionID @entity {
-  id: ID!
+  id: Bytes!
   keyID: Bytes!
   isOpen: Boolean!
   referralAccount: ReferralAccount
@@ -275,6 +275,7 @@ type PositionDecrease @entity(immutable: true) {
 type ReferralAccount @entity {
   id: Bytes!
   code: Bytes!
+  keyIDs: [ReferralPositionID!] @derivedFrom(field: "referralAccount")
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!

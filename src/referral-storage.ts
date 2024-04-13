@@ -12,15 +12,16 @@ export function handleSetTraderReferralCode(
 ): void {
 	let referralAccount = ReferralAccount.load(event.params.account);
 	if (referralAccount) {
-		let referralPositionID = ReferralPositionID.load(
-			event.params.account.toHexString()
-		);
-		if (referralPositionID) {
-			//remove open position
-			let id = referralPositionID.keyID.toHexString();
-			let position = PositionOpen.load(id);
-			if (position) {
-				store.remove("PositionOpen", id);
+		let IDs = referralAccount.keyIDs.load();
+		for (let i = 0; i < IDs.length; i++) {
+			let referralPositionID = ReferralPositionID.load(IDs[i].id);
+			if (referralPositionID) {
+				//remove open position
+				let id = referralPositionID.keyID.toHexString();
+				let position = PositionOpen.load(id);
+				if (position) {
+					store.remove("PositionOpen", id);
+				}
 			}
 		}
 	}

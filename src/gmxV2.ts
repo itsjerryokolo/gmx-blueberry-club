@@ -70,11 +70,9 @@ function onOrderCreated(event: EventLog2): void {
 	const keyId = getBytes32Item(event.params.eventData, 0);
 	const orderCreated = new OrderCreated(keyId);
 
-	let referralPosition = ReferralPositionID.load(
-		referralAccount.id.toHexString()
-	);
+	let referralPosition = ReferralPositionID.load(referralAccount.id);
 	if (referralPosition) {
-		referralPosition = new ReferralPositionID(referralAccount.id.toHexString());
+		referralPosition = new ReferralPositionID(referralAccount.id);
 		referralPosition.keyID = keyId;
 		referralPosition.isOpen = true;
 		referralPosition.referralAccount = referralAccount.id;
@@ -164,9 +162,23 @@ function onOrderCancelled(event: EventLog2): void {
 	const orderId = getBytes32Item(event.params.eventData, 0);
 	const orderCreated = OrderCreated.load(orderId);
 
+	let referralAccount = ReferralAccount.load(
+		getAddressItem(event.params.eventData, 0)
+	)!;
+
 	if (orderCreated === null) {
 		log.error("OrderCreated not found", []);
 		return;
+	}
+
+	let referralPosition = ReferralPositionID.load(referralAccount.id);
+	if (referralPosition) {
+		referralPosition = new ReferralPositionID(referralAccount.id);
+		referralPosition.keyID = orderId;
+		referralPosition.isOpen = true;
+		referralPosition.referralAccount = referralAccount.id;
+
+		referralPosition.save();
 	}
 
 	const message = getStringItem(event.params.eventData, 0);
