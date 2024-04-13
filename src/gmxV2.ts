@@ -70,14 +70,6 @@ function onOrderCreated(event: EventLog2): void {
 	const keyId = getBytes32Item(event.params.eventData, 0);
 	const orderCreated = new OrderCreated(keyId);
 
-	let referralPosition = ReferralPositionID.load(referralAccount.id);
-	if (!referralPosition) {
-		referralPosition = new ReferralPositionID(referralAccount.id);
-	}
-	referralPosition.keyID = keyId;
-	referralPosition.isOpen = true;
-	referralPosition.referralAccount = referralAccount.id;
-
 	orderCreated.account = getAddressItem(event.params.eventData, 0);
 	orderCreated.receiver = getAddressItem(event.params.eventData, 1);
 	orderCreated.callbackContract = getAddressItem(event.params.eventData, 2);
@@ -114,7 +106,6 @@ function onOrderCreated(event: EventLog2): void {
 	orderCreated.isFrozen = getBoolItem(event.params.eventData, 2);
 
 	orderCreated.key = keyId;
-	referralPosition.save();
 
 	orderCreated.save();
 }
@@ -219,7 +210,7 @@ function onPositionIncrease(event: EventLog1): void {
 		log.error("OrderCreated not found", []);
 		return;
 	}
-
+	let referralAccount = ReferralAccount.load(orderCreated.account)!;
 	const orderStatus = dto.createOrderStatus(
 		event,
 		orderCreated,
@@ -232,6 +223,14 @@ function onPositionIncrease(event: EventLog1): void {
 	if (openSlot === null) {
 		openSlot = dto.initPositionOpen(event, positionIncrease);
 	}
+
+	let referralPosition = ReferralPositionID.load(referralAccount.id);
+	if (!referralPosition) {
+		referralPosition = new ReferralPositionID(referralAccount.id);
+	}
+	referralPosition.keyID = positionIncrease.positionKey;
+	referralPosition.isOpen = true;
+	referralPosition.referralAccount = referralAccount.id;
 
 	let positionLink = PositionLink.load(openSlot.link);
 
@@ -278,13 +277,11 @@ function onPositionIncrease(event: EventLog1): void {
 		? openSlot.maxCollateralUsd
 		: collateralUsd;
 
-	let referralAccount = ReferralAccount.load(openSlot.account);
-	if (referralAccount) {
-		openSlot.referralAccount = referralAccount.id;
-		openSlot.referralMember = true;
-		referralAccount.save();
-	}
+	openSlot.referralAccount = referralAccount.id;
+	openSlot.referralMember = true;
 
+	referralPosition.save();
+	referralAccount.save();
 	openSlot.save();
 	positionIncrease.save();
 	orderStatus.save();
