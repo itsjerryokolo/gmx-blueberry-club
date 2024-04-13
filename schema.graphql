@@ -655,6 +655,8 @@ type Claim @entity(immutable: true) {
 type DepositRewards @entity(immutable: true) {
   id: Bytes!
   amount: BigInt! # uint256
+  cashPrize: BigInt # uint256
+  teamFund: BigInt # uint256
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
