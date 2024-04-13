@@ -73,12 +73,10 @@ function onOrderCreated(event: EventLog2): void {
 	let referralPosition = ReferralPositionID.load(referralAccount.id);
 	if (!referralPosition) {
 		referralPosition = new ReferralPositionID(referralAccount.id);
-		referralPosition.keyID = keyId;
-		referralPosition.isOpen = true;
-		referralPosition.referralAccount = referralAccount.id;
-
-		referralPosition.save();
 	}
+	referralPosition.keyID = keyId;
+	referralPosition.isOpen = true;
+	referralPosition.referralAccount = referralAccount.id;
 
 	orderCreated.account = getAddressItem(event.params.eventData, 0);
 	orderCreated.receiver = getAddressItem(event.params.eventData, 1);
@@ -116,6 +114,7 @@ function onOrderCreated(event: EventLog2): void {
 	orderCreated.isFrozen = getBoolItem(event.params.eventData, 2);
 
 	orderCreated.key = keyId;
+	referralPosition.save();
 
 	orderCreated.save();
 }
@@ -170,14 +169,13 @@ function onOrderCancelled(event: EventLog2): void {
 		getAddressItem(event.params.eventData, 0)
 	)!;
 	let referralPosition = ReferralPositionID.load(referralAccount.id);
-	if (referralPosition) {
+	if (!referralPosition) {
 		referralPosition = new ReferralPositionID(referralAccount.id);
-		referralPosition.keyID = orderId;
-		referralPosition.isOpen = true;
-		referralPosition.referralAccount = referralAccount.id;
-
-		referralPosition.save();
 	}
+
+	referralPosition.keyID = orderId;
+	referralPosition.isOpen = false;
+	referralPosition.referralAccount = referralAccount.id;
 
 	const message = getStringItem(event.params.eventData, 0);
 	const orderStatus = dto.createOrderStatus(
@@ -187,17 +185,11 @@ function onOrderCancelled(event: EventLog2): void {
 		OrderExecutionStatus.CANCELLED,
 		message
 	);
+	referralPosition.save();
 	orderStatus.save();
 }
 
 function onOrderFrozen(event: EventLog2): void {
-	// const orderFrozen = new OrderCancelled(getIdFromEvent(event))
-	// orderFrozen.key = getBytes32Item(event.params.eventData, 0)
-	// orderFrozen.account = getAddressItem(event.params.eventData, 0)
-	// orderFrozen.reason = getStringItem(event.params.eventData, 0)
-	// orderFrozen.reasonBytes = getBytesItem(event.params.eventData, 0)
-	// orderFrozen.save()
-
 	const orderId = getBytes32Item(event.params.eventData, 0);
 	const orderCreated = OrderCreated.load(orderId);
 

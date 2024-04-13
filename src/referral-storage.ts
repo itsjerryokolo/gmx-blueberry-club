@@ -16,7 +16,7 @@ export function handleSetTraderReferralCode(
 		for (let i = 0; i < IDs.length; i++) {
 			let referralPositionID = ReferralPositionID.load(IDs[i].id);
 			if (referralPositionID) {
-				//remove open position
+				//remove open positions
 				let id = referralPositionID.keyID.toHexString();
 				let position = PositionOpen.load(id);
 				if (position) {

@@ -1,11 +1,6 @@
 specVersion: 0.0.5
 schema:
   file: ./schema.graphql
-# features:
-#   - grafting
-# graft:
-#   base: QmNr3mwDy6qC9TDMJc9fHEYpGyvXWESpH3mMCcJKCgyknU
-#   block: 179037610
 dataSources:
   - kind: ethereum
     name: EventEmitter

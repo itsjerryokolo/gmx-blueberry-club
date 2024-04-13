@@ -662,16 +662,6 @@ type DepositRewards @entity(immutable: true) {
   transactionHash: Bytes!
 }
 
-# type UserScoreUpdate @entity(immutable: true) {
-#   id: Bytes!
-#   user: Bytes! # address
-#   volume: BigInt! # uint256
-#   profit: BigInt! # uint256
-#   blockNumber: BigInt!
-#   blockTimestamp: BigInt!
-#   transactionHash: Bytes!
-# }
-
 type WeightsUpdate @entity(immutable: true) {
   id: Bytes!
   profitWeight: BigInt! # uint256

@@ -57,18 +57,3 @@ export function handleWeightsUpdate(event: WeightsUpdateEvent): void {
 
 	entity.save();
 }
-
-// export function handleUserScoreUpdate(event: UserScoreUpdateEvent): void {
-//   const entity = new UserScoreUpdate(
-//     event.transaction.hash.concatI32(event.logIndex.toI32())
-//   )
-//   entity.user = event.params.user
-//   entity.volume = event.params.volume
-//   entity.profit = event.params.profit
-
-//   entity.blockNumber = event.block.number
-//   entity.blockTimestamp = event.block.timestamp
-//   entity.transactionHash = event.transaction.hash
-
-//   entity.save()
-// }
