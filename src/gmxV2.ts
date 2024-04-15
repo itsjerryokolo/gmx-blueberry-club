@@ -26,7 +26,6 @@ import {
 	getUintItem,
 } from "./common/datastore";
 import { getIdFromEvent } from "./common/utils";
-import { OpenPosition } from "../generated/Orchestrator/Orchestrator";
 
 export function handleEventLog1(event: EventLog1): void {
 	if (event.params.eventName == "OraclePriceUpdate") {
