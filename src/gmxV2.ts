@@ -9,7 +9,6 @@ import {
 	ReferralAccount,
 	PriceCandle,
 	PriceCandleSeed,
-	ReferralPositionID,
 } from "../generated/schema";
 import * as dto from "./common/dto";
 import {
@@ -62,7 +61,7 @@ export function handleEventLog2(event: EventLog2): void {
 
 function onOrderCreated(event: EventLog2): void {
 	let referralAccount = ReferralAccount.load(
-		getAddressItem(event.params.eventData, 0)
+		getAddressItem(event.params.eventData, 0).toHexString()
 	);
 	if (!referralAccount) return;
 
@@ -105,7 +104,6 @@ function onOrderCreated(event: EventLog2): void {
 	orderCreated.isFrozen = getBoolItem(event.params.eventData, 2);
 
 	orderCreated.key = keyId;
-
 	orderCreated.save();
 }
 
@@ -155,17 +153,6 @@ function onOrderCancelled(event: EventLog2): void {
 		log.error("OrderCreated not found", []);
 		return;
 	}
-	let referralAccount = ReferralAccount.load(
-		getAddressItem(event.params.eventData, 0)
-	)!;
-	let referralPosition = ReferralPositionID.load(referralAccount.id);
-	if (!referralPosition) {
-		referralPosition = new ReferralPositionID(referralAccount.id);
-	}
-
-	referralPosition.keyID = orderId;
-	referralPosition.isOpen = false;
-	referralPosition.referralAccount = referralAccount.id;
 
 	const message = getStringItem(event.params.eventData, 0);
 	const orderStatus = dto.createOrderStatus(
@@ -175,7 +162,6 @@ function onOrderCancelled(event: EventLog2): void {
 		OrderExecutionStatus.CANCELLED,
 		message
 	);
-	referralPosition.save();
 	orderStatus.save();
 }
 
@@ -209,7 +195,9 @@ function onPositionIncrease(event: EventLog1): void {
 		log.error("OrderCreated not found", []);
 		return;
 	}
-	let referralAccount = ReferralAccount.load(orderCreated.account)!;
+	let referralAccount = ReferralAccount.load(
+		orderCreated.account.toHexString()
+	)!;
 	const orderStatus = dto.createOrderStatus(
 		event,
 		orderCreated,
@@ -222,14 +210,6 @@ function onPositionIncrease(event: EventLog1): void {
 	if (openSlot === null) {
 		openSlot = dto.initPositionOpen(event, positionIncrease);
 	}
-
-	let referralPosition = ReferralPositionID.load(referralAccount.id);
-	if (!referralPosition) {
-		referralPosition = new ReferralPositionID(referralAccount.id);
-	}
-	referralPosition.keyID = positionIncrease.positionKey;
-	referralPosition.isOpen = true;
-	referralPosition.referralAccount = referralAccount.id;
 
 	let positionLink = PositionLink.load(openSlot.link);
 
@@ -279,7 +259,6 @@ function onPositionIncrease(event: EventLog1): void {
 	openSlot.referralAccount = referralAccount.id;
 	openSlot.referralMember = true;
 
-	referralPosition.save();
 	referralAccount.save();
 	openSlot.save();
 	positionIncrease.save();
@@ -332,7 +311,9 @@ function onPositionDecrease(event: EventLog1): void {
 			orderId
 		);
 
-		let referralAccount = ReferralAccount.load(positionSettled.account);
+		let referralAccount = ReferralAccount.load(
+			positionSettled.account.toHexString()
+		);
 		if (referralAccount) {
 			positionSettled.referralAccount = referralAccount.id;
 			referralAccount.save();

@@ -1,29 +1,16 @@
 import { Address, log, store } from "@graphprotocol/graph-ts";
 import { SetTraderReferralCode } from "../generated/ReferralStorage/ReferralStorage";
-import {
-	PositionOpen,
-	ReferralAccount,
-	ReferralPositionID,
-} from "../generated/schema";
+import { ReferralAccount } from "../generated/schema";
 import { BLUEBERRY_REFERRAL_CODE } from "./common/const";
 
 export function handleSetTraderReferralCode(
 	event: SetTraderReferralCode
 ): void {
-	let referralAccount = ReferralAccount.load(event.params.account);
+	let referralAccount = ReferralAccount.load(
+		event.params.account.toHexString()
+	);
 	if (referralAccount) {
-		let IDs = referralAccount.keyIDs.load();
-		for (let i = 0; i < IDs.length; i++) {
-			let referralPositionID = ReferralPositionID.load(IDs[i].id);
-			if (referralPositionID) {
-				//remove open positions
-				let id = referralPositionID.keyID.toHexString();
-				let position = PositionOpen.load(id);
-				if (position) {
-					store.remove("PositionOpen", id);
-				}
-			}
-		}
+		store.remove("ReferralAccount", event.params.account.toHexString());
 	}
 
 	if (event.params.code.toHexString() == BLUEBERRY_REFERRAL_CODE) {
@@ -32,7 +19,9 @@ export function handleSetTraderReferralCode(
 			event.params.code.toHexString(),
 		]);
 
-		let referralAccount = new ReferralAccount(event.params.account);
+		let referralAccount = new ReferralAccount(
+			event.params.account.toHexString()
+		);
 		referralAccount.code = event.params.code;
 		referralAccount.blockNumber = event.block.number;
 		referralAccount.blockTimestamp = event.block.timestamp;

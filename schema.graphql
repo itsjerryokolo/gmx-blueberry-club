@@ -27,13 +27,6 @@ type OrderCreated @entity(immutable: true) {
   isFrozen: Boolean!
 }
 
-type ReferralPositionID @entity {
-  id: Bytes!
-  keyID: Bytes!
-  isOpen: Boolean!
-  referralAccount: ReferralAccount
-}
-
 type OrderSizeDeltaAutoUpdated @entity(immutable: true) {
   id: Bytes!
   key: Bytes!
@@ -273,9 +266,8 @@ type PositionDecrease @entity(immutable: true) {
 }
 
 type ReferralAccount @entity {
-  id: Bytes!
+  id: ID!
   code: Bytes!
-  keyIDs: [ReferralPositionID!] @derivedFrom(field: "referralAccount")
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
