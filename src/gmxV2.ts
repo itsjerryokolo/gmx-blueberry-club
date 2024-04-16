@@ -317,11 +317,10 @@ function onPositionDecrease(event: EventLog1): void {
 		if (referralAccount) {
 			positionSettled.referralAccount = referralAccount.id;
 			referralAccount.save();
+		} else {
+			store.remove("PositionOpen", openPosition.id);
 		}
-
 		positionSettled.save();
-
-		store.remove("PositionOpen", openPosition.id);
 	}
 
 	orderStatus.save();
